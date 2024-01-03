@@ -13,6 +13,9 @@ const LandingPage = () => {
         <Link href="/sign-up">
           <Button>register</Button>
         </Link>
+        <Link href="/dashboard">
+          <Button>dashboard</Button>
+        </Link>
       </div>
     </div>
   );
