@@ -2,7 +2,7 @@
 
 import Heading from "@/components/Heading";
 import { MessageSquare } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { formSchema } from "./constant";
@@ -10,8 +10,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import Empty from "@/components/Empty";
+import Loader from "@/components/Loader";
+import { cn } from "@/lib/utils";
 
 const ConversationPage = () => {
+  const router = useRouter();
+  const [messages, setMessages] = useState<{ role: string; parts: string }[]>(
+    []
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -22,7 +32,42 @@ const ConversationPage = () => {
   const isLoading = form.formState.isSubmitting;
 
   const submitHandler = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      const userMessage:{ role: string; parts: string } = {
+        role: "user",
+        parts: values.prompt,
+      };
+
+      const newMessages = [...messages, userMessage];
+      const response = await axios.post("/api/conversation", {
+        messages: newMessages,
+      });
+
+
+      const responseData:{ role: string; parts: string } = {
+        role: "AI",
+        parts: response.data,
+      }
+
+
+      setMessages((curr)=>[...curr,userMessage,responseData])
+
+      console.log(response);
+
+      // const responseData = response.data; // Assuming the response data is a string
+      // setMessages((curr) => [...curr, { role: 'user', parts: values.prompt }, { role: 'AI', parts: responseData }]);
+
+
+      console.log(messages);
+      
+      form.reset();
+
+
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      router.refresh();
+    }
   };
   return (
     <div>
@@ -67,9 +112,27 @@ const ConversationPage = () => {
           </Form>
         </div>
 
-
         <div className="space-y-4 mt-4">
-          Response Content
+          {isLoading && (
+            <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
+              <Loader/>
+            </div>
+          )}
+          {messages.length === 0 && !isLoading && (
+         <Empty label="Conversation not started"/>
+          )}
+          <div className="flex flex-col-reverse gap-y-4">
+            {messages.map((msg) => (
+              <div 
+              key={msg.parts}
+              className={cn("p-8 w-full flex items-start gap-x-8 rounded-lg", msg.role === "user" ? "bg-white border border-black/10" : "bg-muted")}
+
+              >
+                {msg.parts}
+                
+                </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
