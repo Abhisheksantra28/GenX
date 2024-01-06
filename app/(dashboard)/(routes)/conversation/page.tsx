@@ -33,42 +33,39 @@ const ConversationPage = () => {
 
   const submitHandler = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage:{ role: string; parts: string } = {
+      const userMessage: { role: string; parts: string } = {
         role: "user",
         parts: values.prompt,
       };
 
       const newMessages = [...messages, userMessage];
+ 
+      
       const response = await axios.post("/api/conversation", {
-        messages: newMessages,
+        messages: values.prompt,
       });
 
-
-      const responseData:{ role: string; parts: string } = {
-        role: "AI",
-        parts: response.data,
-      }
-
-
-      setMessages((curr)=>[...curr,userMessage,responseData])
+      // setMessages((curr)=>[...curr,userMessage,responseData])
 
       console.log(response);
 
-      // const responseData = response.data; // Assuming the response data is a string
-      // setMessages((curr) => [...curr, { role: 'user', parts: values.prompt }, { role: 'AI', parts: responseData }]);
-
+      const responseData = response.data; // Assuming the response data is a string
+      setMessages((curr) => [
+        ...curr,
+        { role: "user", parts: values.prompt },
+        { role: "AI", parts: responseData },
+      ]);
 
       console.log(messages);
-      
+
       form.reset();
-
-
     } catch (error: any) {
       console.log(error);
     } finally {
       router.refresh();
     }
   };
+
   return (
     <div>
       <Heading
@@ -115,22 +112,25 @@ const ConversationPage = () => {
         <div className="space-y-4 mt-4">
           {isLoading && (
             <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
-              <Loader/>
+              <Loader />
             </div>
           )}
           {messages.length === 0 && !isLoading && (
-         <Empty label="Conversation not started"/>
+            <Empty label="Conversation not started" />
           )}
           <div className="flex flex-col-reverse gap-y-4">
             {messages.map((msg) => (
-              <div 
-              key={msg.parts}
-              className={cn("p-8 w-full flex items-start gap-x-8 rounded-lg", msg.role === "user" ? "bg-white border border-black/10" : "bg-muted")}
-
+              <div
+                key={msg.parts}
+                className={cn(
+                  "p-8 w-full flex items-start gap-x-8 rounded-lg",
+                  msg.role === "user"
+                    ? "bg-white border border-black/10"
+                    : "bg-muted"
+                )}
               >
                 {msg.parts}
-                
-                </div>
+              </div>
             ))}
           </div>
         </div>
