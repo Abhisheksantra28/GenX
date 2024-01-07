@@ -3,7 +3,7 @@ import { GoogleGenerativeAI, SafetySetting } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 // Access your API key as an environment variable (see "Set up your API key" above)
-const genAI = new GoogleGenerativeAI("AIzaSyDxIsfw_QiGd5uOYDf2-KmK-Y-VDyqYh_M");
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 export const POST = async (req: Request) => {
@@ -12,7 +12,7 @@ export const POST = async (req: Request) => {
     const body = await req.json();
     const { messages } = body;
 
-    console.log(messages);
+    // console.log(messages);
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -22,20 +22,10 @@ export const POST = async (req: Request) => {
       return new NextResponse("Messages are required!!", { status: 400 });
     }
 
-    const generationConfig = {
-      stopSequences: ["red"],
-      maxOutputTokens: 400,
-      temperature: 0.9,
-      topP: 0.1,
-      topK: 16,
-    };
-
-    const chat = model.startChat({
-      generationConfig,
-    });
+    const chat = model.startChat();
 
     const result = await chat.sendMessage(messages[messages.length - 1].parts);
-    const response = await result.response;
+    const response = result.response;
     const text = response.text();
     console.log(text);
 

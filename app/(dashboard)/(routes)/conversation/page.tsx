@@ -15,9 +15,9 @@ import axios from "axios";
 import Empty from "@/components/Empty";
 import Loader from "@/components/Loader";
 import { cn } from "@/lib/utils";
-
-
-
+import Markdown from "react-markdown";
+import { UserAvatar } from "@/components/UserAvatar";
+import { AIAvatar } from "@/components/AIAvatar";
 
 interface ChatCompletion {
   role: string;
@@ -26,9 +26,7 @@ interface ChatCompletion {
 
 const ConversationPage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletion[]>(
-    []
-  );
+  const [messages, setMessages] = useState<ChatCompletion[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,25 +45,18 @@ const ConversationPage = () => {
       };
 
       const newMessages = [...messages, userMessage];
- 
-      
+
       const response = await axios.post("/api/conversation", {
         messages: newMessages,
       });
 
-      console.log("backend response is : ",response);
       const responseData = response.data;
-    
-      
+
       setMessages((curr) => [
         ...curr,
         { role: "user", parts: values.prompt },
         { role: "AI", parts: responseData },
       ]);
-
-      
-
-      console.log("after setMessages the messages are :",messages);
 
       form.reset();
     } catch (error: any) {
@@ -140,8 +131,12 @@ const ConversationPage = () => {
                     : "bg-muted"
                 )}
               >
-
-                {msg.parts}
+                {msg.role === "user" ? <UserAvatar /> : <AIAvatar />}
+               
+                  <Markdown className={cn("w-full h-full")}>
+                    {msg.parts}
+                  </Markdown>
+                
               </div>
             ))}
           </div>
