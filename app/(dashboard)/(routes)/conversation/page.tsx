@@ -16,9 +16,17 @@ import Empty from "@/components/Empty";
 import Loader from "@/components/Loader";
 import { cn } from "@/lib/utils";
 
+
+
+
+interface ChatCompletion {
+  role: string;
+  parts: string;
+}
+
 const ConversationPage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<{ role: string; parts: string }[]>(
+  const [messages, setMessages] = useState<ChatCompletion[]>(
     []
   );
 
@@ -33,7 +41,7 @@ const ConversationPage = () => {
 
   const submitHandler = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: { role: string; parts: string } = {
+      const userMessage: ChatCompletion = {
         role: "user",
         parts: values.prompt,
       };
@@ -42,21 +50,22 @@ const ConversationPage = () => {
  
       
       const response = await axios.post("/api/conversation", {
-        messages: values.prompt,
+        messages: newMessages,
       });
 
-      // setMessages((curr)=>[...curr,userMessage,responseData])
-
-      console.log(response);
-
-      const responseData = response.data; // Assuming the response data is a string
+      console.log("backend response is : ",response);
+      const responseData = response.data;
+    
+      
       setMessages((curr) => [
         ...curr,
         { role: "user", parts: values.prompt },
         { role: "AI", parts: responseData },
       ]);
 
-      console.log(messages);
+      
+
+      console.log("after setMessages the messages are :",messages);
 
       form.reset();
     } catch (error: any) {
@@ -101,6 +110,8 @@ const ConversationPage = () => {
 
               <Button
                 className="col-span-12 lg:col-span-2 w-full"
+                type="submit"
+                size="icon"
                 disabled={isLoading}
               >
                 Generate
@@ -129,6 +140,7 @@ const ConversationPage = () => {
                     : "bg-muted"
                 )}
               >
+
                 {msg.parts}
               </div>
             ))}

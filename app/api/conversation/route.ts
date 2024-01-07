@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SafetySetting } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 // Access your API key as an environment variable (see "Set up your API key" above)
@@ -22,16 +22,32 @@ export const POST = async (req: Request) => {
       return new NextResponse("Messages are required!!", { status: 400 });
     }
 
-    const chat = model.startChat();
+    const generationConfig = {
+      stopSequences: ["red"],
+      maxOutputTokens: 400,
+      temperature: 0.9,
+      topP: 0.1,
+      topK: 16,
+    };
 
-    const result = await chat.sendMessageStream(messages);
+    const chat = model.startChat({
+      generationConfig,
+    });
+
+    const result = await chat.sendMessage(messages[messages.length - 1].parts);
     const response = await result.response;
     const text = response.text();
     console.log(text);
 
-    return NextResponse.json(text);
+    return NextResponse.json(text, {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.log("coversation error", error);
-    return new NextResponse("Gen ai api error", { status: 500 });
+    return new NextResponse("Gen ai api error", {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
