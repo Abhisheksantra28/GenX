@@ -31,7 +31,7 @@ export const POST = async (req: Request) => {
       }
     );
 
-    console.log("Muisc response from replicate is: ", response);
+    
     return NextResponse.json(response, {
       status: 200,
     });
