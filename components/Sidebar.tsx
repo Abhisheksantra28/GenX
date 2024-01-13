@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import {
   Code,
-  ImageIcon,
+  // ImageIcon,
   LayoutDashboard,
   MessageSquare,
   Music,

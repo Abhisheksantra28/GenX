@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   ArrowRight,
   Code,
-  ImageIcon,
+  // ImageIcon,
   MessageSquare,
   Music,
   VideoIcon,
