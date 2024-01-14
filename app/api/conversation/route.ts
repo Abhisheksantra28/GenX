@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+import { increaseAPILimit, checkAPILimit } from "@/lib/apiLimit";
+
 // Access your API key as an environment variable (see "Set up your API key" above)
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -22,12 +24,19 @@ export const POST = async (req: Request) => {
       return new NextResponse("Messages are required!!", { status: 400 });
     }
 
+    const freeTrial = await checkAPILimit();
+
+    if (!freeTrial) {
+      return new NextResponse("Free trial has expired!", { status: 403 });
+    }
+
     const chat = model.startChat();
 
     const result = await chat.sendMessage(messages[messages.length - 1].parts);
     const response = result.response;
     const text = response.text();
-  
+
+    await increaseAPILimit();
 
     return NextResponse.json(text, {
       status: 200,
