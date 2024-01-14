@@ -6,5 +6,12 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-}
+} 
 
+model UserAPILimit {
+  id String @id @default(cuid())
+  userId String @unique
+  count Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
