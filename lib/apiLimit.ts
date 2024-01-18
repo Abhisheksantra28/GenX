@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 import prismaDB from "./prismaDB";
 import { MAX_FREE_COUNTS } from "@/constants";
 
-export const increaseAPILimit = async () => {
+const increaseAPILimit = async () => {
   const { userId } = auth();
 
   if (!userId) return;
@@ -28,7 +28,7 @@ export const increaseAPILimit = async () => {
   }
 };
 
-export const checkAPILimit = async () => {
+const checkAPILimit = async () => {
   const { userId } = auth();
 
   if (!userId) return false;
@@ -43,7 +43,7 @@ export const checkAPILimit = async () => {
   else return false;
 };
 
-export const getAPILimitCount = async () => {
+const getAPILimitCount = async () => {
   const { userId } = auth();
 
   if (!userId) {
@@ -60,3 +60,5 @@ export const getAPILimitCount = async () => {
 
   return userAPILimit.count;
 };
+
+export { increaseAPILimit, checkAPILimit, getAPILimitCount };
