@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import Markdown from "react-markdown";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AIAvatar } from "@/components/AIAvatar";
+import { useProModalStore } from "@/hooks/useProModal";
 
 interface ChatCompletion {
   role: string;
@@ -25,6 +26,7 @@ interface ChatCompletion {
 }
 
 const ConversationPage = () => {
+  const proModal = useProModalStore();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletion[]>([]);
 
@@ -60,7 +62,9 @@ const ConversationPage = () => {
 
       form.reset();
     } catch (error: any) {
-      console.log(error);
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
     } finally {
       router.refresh();
     }
@@ -132,11 +136,8 @@ const ConversationPage = () => {
                 )}
               >
                 {msg.role === "user" ? <UserAvatar /> : <AIAvatar />}
-               
-                  <Markdown className={cn("w-full h-full")}>
-                    {msg.parts}
-                  </Markdown>
-                
+
+                <Markdown className={cn("w-full h-full")}>{msg.parts}</Markdown>
               </div>
             ))}
           </div>

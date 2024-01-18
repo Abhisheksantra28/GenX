@@ -5,10 +5,15 @@ import { Button } from "./ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Sidebar from "./Sidebar";
+import prismaDB from "@/lib/prismaDB";
 
-const MobileSiderbar = () => {
+interface mobileSidebarProps {
+  apiLimitCount: number;
+}
+
+const MobileSiderbar =  ({ apiLimitCount }: mobileSidebarProps) => {
   const [isMounted, setIsMounted] = useState(false);
-  // to fix hydration error 
+  // to fix hydration error
 
   useEffect(() => {
     setIsMounted(true);
@@ -17,6 +22,7 @@ const MobileSiderbar = () => {
   if (!isMounted) {
     return null;
   }
+
   return (
     <Sheet>
       <SheetTrigger>
@@ -25,7 +31,7 @@ const MobileSiderbar = () => {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="p-0 ">
-        <Sidebar />
+        <Sidebar apiLimitCount={apiLimitCount} />
       </SheetContent>
     </Sheet>
   );

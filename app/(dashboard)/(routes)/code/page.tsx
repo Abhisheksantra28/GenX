@@ -16,9 +16,10 @@ import Empty from "@/components/Empty";
 import Loader from "@/components/Loader";
 import { cn } from "@/lib/utils";
 import Markdown from "react-markdown";
-import ReactMarkdown from "react-markdown"
+import ReactMarkdown from "react-markdown";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AIAvatar } from "@/components/AIAvatar";
+import { useProModalStore } from "@/hooks/useProModal";
 
 interface ChatCompletion {
   role: string;
@@ -26,6 +27,7 @@ interface ChatCompletion {
 }
 
 const CodePage = () => {
+  const proModal = useProModalStore();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletion[]>([]);
 
@@ -61,7 +63,9 @@ const CodePage = () => {
 
       form.reset();
     } catch (error: any) {
-      console.log(error);
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
     } finally {
       router.refresh();
     }
@@ -133,27 +137,23 @@ const CodePage = () => {
                 )}
               >
                 {msg.role === "user" ? <UserAvatar /> : <AIAvatar />}
-               
-                  <ReactMarkdown
-                   className="w-full h-full text-sm leading-7 overflow-hidden"
 
+                <ReactMarkdown
+                  className="w-full h-full text-sm leading-7 overflow-hidden"
                   components={{
-                    pre:({node , ...props})=>(
-                     <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg">
-                      <pre {...props}/>
-
-                     </div>
+                    pre: ({ node, ...props }) => (
+                      <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg">
+                        <pre {...props} />
+                      </div>
                     ),
-                    
-                    code:({node, ...props})=>(
-                      <code className="bg-black/10 rounded-lg p-1" {...props}/>
-                    )
+
+                    code: ({ node, ...props }) => (
+                      <code className="bg-black/10 rounded-lg p-1" {...props} />
+                    ),
                   }}
-                   
-                   >
-                    {msg.parts}
-                  </ReactMarkdown>
-                
+                >
+                  {msg.parts}
+                </ReactMarkdown>
               </div>
             ))}
           </div>

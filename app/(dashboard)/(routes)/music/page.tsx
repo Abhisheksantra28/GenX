@@ -14,9 +14,10 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Empty from "@/components/Empty";
 import Loader from "@/components/Loader";
-
+import { useProModalStore } from "@/hooks/useProModal";
 
 const MusicPage = () => {
+  const proModal = useProModalStore();
   const router = useRouter();
   const [music, setMusic] = useState<string>();
 
@@ -31,16 +32,17 @@ const MusicPage = () => {
 
   const submitHandler = async (values: z.infer<typeof formSchema>) => {
     try {
-      
-      setMusic(undefined)
+      setMusic(undefined);
 
-      const response = await axios.post("/api/music",values);
+      const response = await axios.post("/api/music", values);
 
-      setMusic(response.data.audio)
+      setMusic(response.data.audio);
 
       form.reset();
     } catch (error: any) {
-      console.log(error);
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
     } finally {
       router.refresh();
     }
@@ -97,15 +99,13 @@ const MusicPage = () => {
               <Loader />
             </div>
           )}
-          {!music && !isLoading && (
-            <Empty label="No music is generated" />
+          {!music && !isLoading && <Empty label="No music is generated" />}
+
+          {music && (
+            <audio controls className="w-full mt-8">
+              <source src={music} />
+            </audio>
           )}
-          
-         {music && (
-          <audio controls className="w-full mt-8">
-            <source src={music}/>
-          </audio>
-         )}
         </div>
       </div>
     </div>
