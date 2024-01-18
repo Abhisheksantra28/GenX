@@ -7,21 +7,21 @@ export const increaseAPILimit = async () => {
 
   if (!userId) return;
 
-  const userAPILimit = await prismaDB.userAPILImit.findUnique({
+  const userAPILimit = await prismaDB.userAPILimit.findUnique({
     where: {
       userId:userId,
     },
   });
 
   if (!userAPILimit) {
-    await prismaDB.userAPILImit.create({
+    await prismaDB.userAPILimit.create({
       data: {
         userId:userId,
         count: 1,
       },
     });
   } else {
-    await prismaDB.userAPILImit.update({
+    await prismaDB.userAPILimit.update({
       where: { userId:userId },
       data: { count: userAPILimit?.count + 1 },
     });
@@ -33,7 +33,7 @@ export const checkAPILimit = async () => {
 
   if (!userId) return false;
 
-  const userAPILimit = await prismaDB.userAPILImit.findUnique({
+  const userAPILimit = await prismaDB.userAPILimit.findUnique({
     where: {
       userId:userId,
     },
