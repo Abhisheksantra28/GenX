@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 import { increaseAPILimit, checkAPILimit } from "@/lib/apiLimit";
+import { checkSubscription } from "@/lib/subscription";
 
 // Access your API key as an environment variable (see "Set up your API key" above)
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
@@ -28,8 +29,9 @@ export const POST = async (req: Request) => {
     }
 
     const freeTrial = await checkAPILimit();
+    const isPro = await checkSubscription();
 
-    if (!freeTrial) {
+    if (!freeTrial && !isPro) {
       return new NextResponse("Free trial has expired!", { status: 403 });
     }
 
@@ -41,7 +43,8 @@ export const POST = async (req: Request) => {
     const response = result.response;
     const text = response.text();
 
-    await increaseAPILimit();
+    if (!isPro) await increaseAPILimit();
+
     return NextResponse.json(text, {
       status: 200,
       headers: { "Content-Type": "application/json" },
