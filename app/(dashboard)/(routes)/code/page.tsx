@@ -20,6 +20,7 @@ import ReactMarkdown from "react-markdown";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AIAvatar } from "@/components/AIAvatar";
 import { useProModalStore } from "@/hooks/useProModal";
+import toast from "react-hot-toast";
 
 interface ChatCompletion {
   role: string;
@@ -65,6 +66,8 @@ const CodePage = () => {
     } catch (error: any) {
       if (error?.response?.status === 403) {
         proModal.onOpen();
+      } else {
+        toast.error("Something went wrong!");
       }
     } finally {
       router.refresh();

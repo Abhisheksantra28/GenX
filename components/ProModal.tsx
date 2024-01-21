@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Check, Zap } from "lucide-react";
 import { Button } from "./ui/button";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const ProModal = () => {
   const proModal = useProModalStore();
@@ -30,6 +31,7 @@ const ProModal = () => {
       window.location.href = response.data.url;
     } catch (error) {
       console.log("Stripe_Client_Error: ", error);
+      toast.error("Something went wrong!")
     } finally{
       setLoading(false)
     }
