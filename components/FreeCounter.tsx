@@ -28,9 +28,21 @@ const FreeCounter = ({
     return null;
   }
 
-  if (isPro) return null;
+  if (isPro) {
+    return (
+      <div className="px-3">
+        <Card className="bg-white/10 border-0">
+          <CardContent className="py-6">
+            <Button  className="w-full cursor-text" variant="pro">
+              <Zap className="w-4 h-4 mr-2 fill-white" />
+               Limitless Generations
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  
   return (
     <div className="px-3">
       <Card className="bg-white/10 border-0">
