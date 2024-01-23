@@ -29,3 +29,7 @@ model UserSubcription {
 // Every time when we modify schema we have o perform these operations
 // 1. npx prisma generate (to add it into node_modules)
 // 2. npx prisma db push (to push at planteScale)
+
+// to reset database 
+// 1. npx prisma migrate reset
+// 2. npx prisma db push (to push at planteScale)
