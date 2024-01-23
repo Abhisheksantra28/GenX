@@ -12,17 +12,21 @@ export const GET = async () => {
     const { userId } = auth();
     const user = await currentUser();
 
+    // Check if user is authenticated
     if (!userId || !user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Fetch user subscription details
     const userSubscription = await prismaDB.userSubcription.findUnique({
       where: {
         userId,
       },
     });
 
+    // Check if user is on a paid plan
     if (userSubscription && userSubscription.stripeCustomerId) {
+      // Create a portal session to manage subscription
       const stripeSession = await stripe.billingPortal.sessions.create({
         customer: userSubscription.stripeCustomerId,
         return_url: settingUrl,
@@ -31,6 +35,7 @@ export const GET = async () => {
       return new NextResponse(JSON.stringify({ url: stripeSession.url }));
     }
 
+    // User is on a free plan - Create a checkout session to upgrade
     const stripeSession = await stripe.checkout.sessions.create({
       success_url: settingUrl,
       cancel_url: settingUrl,
@@ -62,7 +67,11 @@ export const GET = async () => {
 
     return new NextResponse(JSON.stringify({ url: stripeSession.url }));
   } catch (error) {
-    console.log("Stripe_Error: ", error);
-    return new NextResponse("Internal server error in stripe", { status: 500 });
+    // Log the error and return a more specific error message
+    console.error("Error in Stripe checkout session creation: ", error);
+    return new NextResponse(
+      "Internal server error in stripe checkout session creation",
+      { status: 500 }
+    );
   }
 };
