@@ -6,6 +6,10 @@ html, body, :root{
   height: 100%;
 }
  
+::selection{
+  color: rgb(228, 180, 19);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
