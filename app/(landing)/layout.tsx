@@ -1,4 +1,4 @@
-import LandingContent from "@/components/LandingFooter";
+import LandingFooter from "@/components/LandingFooter";
 import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
@@ -8,7 +8,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
         <div className="mx-auto max-w-screen-xl h-full w-full">{children}</div>
       </main>
       <footer className="mb-4">
-        <LandingContent />
+        <LandingFooter />
       </footer>
     </div>
   );
